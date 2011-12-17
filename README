@@ -1,0 +1,2 @@
+fatal error: X11/Xlib.h: No such file or directory 
+--> sudo apt-get install libx11-dev
