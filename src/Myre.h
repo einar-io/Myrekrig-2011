@@ -38,7 +38,8 @@ const int name##_MemSize = sizeof(mem);
 #if !(defined(_SYS_BSD_TYPES_H) || defined(_LINUX_TYPES_H) || defined(_SYS_TYPES_H))
 typedef unsigned char u_char;
 typedef unsigned short u_short;
-typedef unsigned long u_long;
+//typedef unsigned long u_long;
+typedef unsigned long long u_long;	// linux has 64bit for long, we need to debug and windows requires long long for 64bit.
 #endif
 #ifndef __cplusplus
 typedef int bool;
@@ -57,7 +58,9 @@ struct SquareData {
 
 struct AntData {
    struct AntData *MapNext, *MapPrev;
-   u_short Index, Team, XPos, YPos;
+//   u_short Index, Team, XPos, YPos;
+   u_short Index, XPos, YPos;
+   u_char Team;
    u_long Age, NextTurn;
    u_long Mem[1];
 };

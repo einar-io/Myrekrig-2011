@@ -1,4 +1,3 @@
-
 #include "MyreKrig.h"
 
 UseAntBegin

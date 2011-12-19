@@ -1,19 +1,18 @@
-#ANTFILES = $(wildcard Racer/*.c)
-ANTFILES = ${shell perl -ne 'if (/^UseAnt\(([^\)]*)\)/ && ! $$e{$$1}) { print "Racer/$$1.c "; $$e{$$1} = 1; }' MyreHold.c}
-#ANTFILES = Racer/Blitz.c Racer/Caesar.c
+#ANTFILES = $(wildcard src/Racer/*.c)
+ANTFILES = ${shell perl -ne 'if (/^UseAnt\(([^\)]*)\)/ && ! $$e{$$1}) { print "src/Racer/$$1.c "; $$e{$$1} = 1; }' src/MyreHold.c}
 
 CC = gcc
-CFLAGS =  -fsigned-char -Wall -O3 -I. $(DEBUG) -m32
-LDFLAGS = -m32
+CFLAGS =  -fsigned-char -Wall -O3 -I. $(DEBUG)
+LDFLAGS = 
 DEBUG = $(if $(findstring debug, $(MAKECMDGOALS)),-ggdb,-DNDEBUG)
 
-MAIN = MyreKrig.o MyreHold.o
-SYS = MK_Quiet.o MK_Ascii.o MK_Count.o MK_XWin.o
+MAIN = src/MyreKrig.o src/MyreHold.o
+SYS = src/MK_Quiet.o src/MK_Ascii.o src/MK_Count.o src/MK_XWin.o
 ANTS = $(ANTFILES:%.c=%.o)
 
-MAINDEP = MyreKrig.h Myre.h
-SYSDEP = MyreKrig.h Myre.h
-ANTSDEP = Myre.h
+MAINDEP = src/MyreKrig.h src/Myre.h
+SYSDEP = src/MyreKrig.h src/Myre.h
+ANTSDEP = src/Myre.h
 
 OBJS = $(MAIN) $(SYS) $(ANTS)
 

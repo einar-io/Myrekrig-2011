@@ -131,6 +131,31 @@ char *TurnString = NULL;
 char CrashTeam[13] = "CrashTeam:  ";
 //|
 
+static u_long DetermineParameter(u_long mmin, u_long mmax)
+{
+	return mmin + Random(mmax-mmin+1);
+}
+
+static void SetupBattleParameters(struct Parameters *Used, struct Parameters *Min, struct Parameters *Max)
+{
+	//for(p = 0 ; p < sizeof(struct Parameters)/4 ; p++) {
+	//int min = ((u_long *)&Args.Min)[p], max = ((u_long *)&Args.Max)[p];
+	//((u_long *)&Used)[p] = min + Random(max-min+1);
+	//}
+	Used->MapWidth = DetermineParameter(Min->MapWidth, Max->MapWidth);
+	Used->MapHeight = DetermineParameter(Min->MapHeight, Max->MapHeight);
+	Used->StartAnts = DetermineParameter(Min->StartAnts, Max->StartAnts);
+	Used->NewFoodSpace = DetermineParameter(Min->NewFoodSpace, Max->NewFoodSpace);
+	Used->NewFoodMin = DetermineParameter(Min->NewFoodMin, Max->NewFoodMin);
+	Used->NewFoodDiff = DetermineParameter(Min->NewFoodDiff, Max->NewFoodDiff);
+	Used->HalfTimeTurn = DetermineParameter(Min->HalfTimeTurn, Max->HalfTimeTurn);
+	Used->TimeOutTurn = DetermineParameter(Min->TimeOutTurn, Max->TimeOutTurn);
+	Used->WinPercent = DetermineParameter(Min->WinPercent, Max->WinPercent);
+	Used->HalfTimePercent = DetermineParameter(Min->HalfTimePercent, Max->HalfTimePercent);
+	Used->BattleSize = DetermineParameter(Min->BattleSize, Max->BattleSize);
+
+}
+
 /* main() indeholder den yderste struktur.
    setTitle() sætter titel og farve på en myre udfra det angivne navn
    ParseArgs() læser argumenter og bruger dem.
@@ -143,7 +168,7 @@ char CrashTeam[13] = "CrashTeam:  ";
    ---------------------------------------------------------- */
 /// int  main(int argc, char *argv[])
 int main(int argc, char *argv[]) {
-   int tc, sc = 0, br = 0, p, n;
+   int tc, sc = 0, br = 0, n;
 
    InitTeams();
    Args.GameSeed = time(0);
@@ -163,16 +188,14 @@ int main(int argc, char *argv[]) {
 
          /* Sæt parametre op til kampen. */
          BattleSeed = Args.GameSeed;
-         for(p = 0 ; p < sizeof(struct Parameters)/4 ; p++) {
-            int min = ((u_long *)&Args.Min)[p], max = ((u_long *)&Args.Max)[p];
-            ((u_long *)&Used)[p] = min + Random(max-min+1);
-         }
+		 SetupBattleParameters(&Used, &Args.Min, &Args.Max);
          Used.MapWidth = (Used.MapWidth+63)&-64;
          Used.MapHeight = (Used.MapHeight+63)&-64;
 
 	 /* Udvælg hold */
 	 for(n = 0 ; n < Used.BattleSize ; n++) {
-	    int t,f,n2;
+		 u_long t;
+	    int f,n2;
 	    do {
 	       t = Random(NumTeams)+1;
 	       f = 0;
@@ -183,8 +206,8 @@ int main(int argc, char *argv[]) {
 	       }
 	    } while (f);
 	    if (Args.WatchTeam == t) WatchTeamSeen = 1;
-	    BattleTeams[n] = t;
-	    TeamIndex[t] = n;
+	    BattleTeams[n] = (u_char) t;
+	    TeamIndex[t] = (u_char) n;
 	 }
 
 	 if (WatchTeamSeen) {
@@ -201,7 +224,7 @@ int main(int argc, char *argv[]) {
 		  sc = SysCheck();
 		  if(sc == SYS_MAKELAST) {
 		     if(NumBattlesSwap == 0) {
-		        NumBattlesSwap = Args.NumBattles;
+		        NumBattlesSwap = (u_short) Args.NumBattles;
 			Args.NumBattles = BattleCount+1;
 		     } else {
 		        Args.NumBattles = NumBattlesSwap;
@@ -324,13 +347,14 @@ void ParseArgs(int argc, char *argv[]) {
 }
 //|
 /// bool TermCheck()
-bool TermCheck() {
+bool TermCheck(void) {
    if(Used.BattleSize == 1) {
       Winner = BattleTeams[0];
       return (NumFood == 0 ? CurrentTurn >= Used.HalfTimeTurn ? TERM_HALFTIME : TERM_WIN :
 	      CurrentTurn >= Used.TimeOutTurn ? TERM_TIMEOUT : TERM_CONTINUE);
    } else {
-      int n, val, val1 = 0, val2 = 0;
+      int n;
+	  u_long val, val1 = 0, val2 = 0;
       for(n = 0 ; n < Used.BattleSize ; n++) {
 	 int t = BattleTeams[n];
 	 val = TeamDatas[t].NumAnts+BaseValue*TeamDatas[t].NumBases;
@@ -350,7 +374,7 @@ bool TermCheck() {
 }
 //|
 /// void PrintGameBegin()
-void PrintGameBegin() {
+void PrintGameBegin(void) {
    int t;
    printf("MyreKrig version 2.4.7 (26.06.03)\n\n");
 
@@ -383,7 +407,7 @@ void PrintGameBegin() {
 }
 //|
 /// void PrintBattleBegin()
-void PrintBattleBegin() {
+void PrintBattleBegin(void) {
    int n;
    printf("%s%4d %10lu %4ld %4ld %3ld %3ld %3ld %3ld ", (skipped ? "\x0d" : ""),
       BattleCount+1, Args.GameSeed,
@@ -514,7 +538,7 @@ u_long ScaleDiv(u_long a, u_long b, u_long scale) {
    FoodOwnTouch() tæller mad-ejendom op for det givne felt.
    ------------------------------------------------------------ */
 /// void DoTurn()
-void DoTurn() {
+void DoTurn(void) {
    struct AntData *ant;
    /* Ny tur */
    CurrentTurn++;
@@ -527,7 +551,7 @@ void DoTurn() {
       AntList[ant->Index] = AntList[--TurnAnts];
       AntList[ant->Index]->Index = ant->Index;
       AntList[TurnAnts] = ant;
-      ant->Index = TurnAnts;
+      ant->Index = (u_short) TurnAnts;
       /* Kald myrerutinen og udfør dens ordre */
       DoAction(ant,RunAnt(ant));
    }
@@ -610,7 +634,7 @@ int RunAnt(struct AntData *ant) {
 void DoAction(struct AntData *ant, int action) {
    int t;
    int x = ant->XPos, y = ant->YPos;
-   int nx = x, ny = y;
+   u_long nx = x, ny = y;
    struct SquareData *sd,*sd2;
 
    /* Hvor vil myren hen? */
@@ -683,14 +707,14 @@ void DoAction(struct AntData *ant, int action) {
       ant->MapPrev = MapAnt(nx,ny).MapLast;
       MapAnt(nx,ny).MapLast->MapNext = ant;
       MapAnt(nx,ny).MapLast = ant;
-      ant->XPos = nx; ant->YPos = ny;
+      ant->XPos = (u_short) nx; ant->YPos = (u_short) ny;
       sd2->Team = ant->Team;
       sd2->NumAnts++;
       /* Flyt mad med, hvis der bliver bedt om det */
       if((action&8) && sd->NumFood && sd2->NumFood < MaxSquareFood) {
          sd->NumFood--;
          if(sd2->Base) {
-            NewAnt(nx,ny);
+            NewAnt( (int) nx, (int) ny);		//HACK: NewAnt should probably have unsigned arguments
             NumFood--;
          } else
             sd2->NumFood++;
@@ -699,19 +723,19 @@ void DoAction(struct AntData *ant, int action) {
       FoodOwnTouch(sd,1);
       FoodOwnTouch(sd2,1);
       /* Fortæl system-rutinerne, at der er sket noget */
-      SysSquareChanged(x,y);
-      SysSquareChanged(nx,ny);
+      SysSquareChanged( x, y);					//HACK: SysSquareChanged should probably have unsigned arguments
+      SysSquareChanged( (int) nx, (int) ny);
    }
 }
 //|
 /// void PlaceFood()
-void PlaceFood() {
+void PlaceFood(void) {
    static short LastFoodX[LastFoodMem],LastFoodY[LastFoodMem];
    short i,j, x,y, xdist,ydist, bestx = 0,besty = 0, mindist, bestdist = -1, num;
    struct SquareData data;
    for(i = 0 ; i < 20 ; i++) {
       do {
-         x = Random(Used.MapWidth); y = Random(Used.MapHeight);
+         x = (short) Random(Used.MapWidth); y = (short) Random(Used.MapHeight);
          data = MapData(x,y);
       } while(data.NumAnts || data.NumFood || data.Base);
 
@@ -760,7 +784,7 @@ void FoodOwnTouch(struct SquareData *sd, int factor) {
    KillAnt() dræber den angivne myre.
    ----------------------------------------------- */
 /// struct AntData *AllocAnt()
-struct AntData *AllocAnt() {
+struct AntData *AllocAnt(void) {
   struct AntData *ant = AntFreeList;
   AntFreeList = ant->MapNext;
   return ant;
@@ -776,6 +800,9 @@ void FreeAnt(struct AntData *ant) {
 void NewAnt(int x, int y) {
    int team = MapData(x,y).Team;
    struct AntData *ant;
+
+	assert(x >= 0);
+	assert(y >= 0);
    /* Reserver RAM */
    ant = AllocAnt();
    /* Indsæt myren i myrelisten */
@@ -838,7 +865,7 @@ void KillAnt(struct AntData *ant, int team) {
    GameExit() ryder op efter et spil.
    ---------------------------------- */
 /// bool GameInit()
-bool GameInit() {
+bool GameInit(void) {
    MaxAnts = NumTeams*Max.StartAnts + Max.MapWidth*Max.MapHeight/Args.Min.NewFoodSpace+Max.NewFoodMin+Max.NewFoodDiff;
    AntMem = LargestMem <= sizeof(u_long) ? sizeof(struct AntData) : sizeof(struct AntData)-sizeof(u_long)+LargestMem;
    return (GameTotals   = (struct GameTotal *)  calloc(NumTeams+1,sizeof(struct GameTotal)))
@@ -867,7 +894,7 @@ bool GameInit() {
 }
 //|
 /// void BattleInit()
-void BattleInit() {
+void BattleInit(void) {
    int i,n,t;
    struct SquareAnts *ptr;
    struct AntData *ant;
@@ -988,11 +1015,11 @@ void BattleInit() {
 }
 //|
 /// void BattleExit()
-void BattleExit() {
+void BattleExit(void) {
 }
 //|
 /// void GameExit()
-void GameExit() {
+void GameExit(void) {
    /* Frigiv RAM */
    if (TeamDatas)    { free(TeamDatas);    TeamDatas    = 0; }
    if (GameTotals)   { free(GameTotals);   GameTotals   = 0; }
