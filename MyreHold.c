@@ -4,6 +4,7 @@
 UseAntBegin
 UseAnt(SunMyre)
 UseAnt(LightCore3)
+UseAnt(Servant)
 
 
 /* Standard *
