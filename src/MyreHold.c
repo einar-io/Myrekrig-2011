@@ -2,9 +2,8 @@
 
 UseAntBegin
 UseAnt(SunMyre)
-UseAnt(LightCore3)
 UseAnt(Servant)
-
+UseAnt(ElephAnt)
 
 /* Standard *
 #UseAnt(A5)
