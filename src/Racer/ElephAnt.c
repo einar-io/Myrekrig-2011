@@ -3,22 +3,24 @@
 
 enum {Right = 1, Left = 3, Up = 4, Down = 2, UpWithFood = 12, RightWithFood = 9, LeftWithFood = 11, DownWithFood = 10};
 
-int goRandomDirection(u_long random);
+int goRandomDirection(u_long random, u_long count);
 
 struct AntBrain {
    u_long random;
    short x,y;
    short foodx[10],foody[10];
-   u_long timeout;
+   u_long count;
    short currentx, currenty;
 };
+
+struct AntBrain mem;
 
 
 int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
 
     
     int selectedDirection = 0;
-    
+    mem->count ++;
     
     
     //Hvis myren står alene på en base, gå et random sted hen efter mad.
@@ -26,13 +28,13 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
     {
         (mem->x) = 0;
         (mem->y) = 0;
-        selectedDirection = goRandomDirection(mem->random);
+        selectedDirection = goRandomDirection(mem->random, mem->count);
     }
     
     //Hvis myren ikke står på en base, gå et random sted hed efter mad.
     if(felter->NumFood == 0)
     {
-        selectedDirection = goRandomDirection(mem->random);
+        selectedDirection = goRandomDirection(mem->random, mem->count);
     }
     
     //Hvis der er mad på pågældende felt, tag det med til basen.
@@ -70,7 +72,7 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
         }
         case(Down):
         {
-           mem->currenty -= 1; 
+           mem->currenty -= 1;
         }
         case(Left):
         {
@@ -86,7 +88,7 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
         }
         case(DownWithFood):
         {
-           mem->currenty -= 1; 
+           mem->currenty -= 1;
         }
         case(LeftWithFood):
         {
@@ -100,40 +102,18 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
             break;
     }
     
-    
- 
-
-
-
     return selectedDirection;
 }
 
-int goRandomDirection(u_long random)
+int goRandomDirection(u_long random, u_long count)
 {
-    if(random < 1073741823)
-    {
-        return Right;
-    }
+    u_long randomseed;
+  
+
+    randomseed = ((((random)^count))%5)+1;
     
-    if((random > 1073741823) && (random < 2147483647))
-    {
-        return Left;
-    }
+    return randomseed;
     
-    if((random > 2147483647) && (random < 3221225471))
-    {
-        return Up;
-    }
-    
-    if(random > 3221225471)
-    {
-        return Down;
-    }
-    
-    else
-    {
-        return 0;
-    }
 }
 
 DefineAnt(ElephAnt, "ElephAnt", AntFunc, struct AntBrain);
