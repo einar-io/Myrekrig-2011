@@ -1,2 +1,6 @@
+2011 opdatering af Aske Simon Christensens klassiske MyreKrig, fiflet med af et par raske gutter. Originalen findes på http://www.myrekrig.dk .
+
+Dette release fixer bl.a. 64-bit compile bugs på nyere Linux, og tilføjer en Visual Studio 2010 solution til Windows brugere, og vil muligvis kigge lidt på et nyere build-system og eventuelt lidt grafisk user interface til Windows. Bare fordi de to andre versioner, og en privat tredje, ikke er NOK :-)
+
 fatal error: X11/Xlib.h: No such file or directory 
 --> sudo apt-get install libx11-dev

@@ -13,8 +13,6 @@ struct AntBrain {
    short currentx, currenty;
 };
 
-struct AntBrain mem;
-
 
 int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
 

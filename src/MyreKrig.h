@@ -5,6 +5,10 @@
 
 #include <stdlib.h>
 
+#if _MSC_VER
+#define snprintf _snprintf
+#endif
+
 /* C++ må også godt være med */
 
 #ifdef __cplusplus
@@ -59,7 +63,7 @@ extern "C" {
 }
 
 #define UseAntBegin \
-void InitTeams() { \
+void InitTeams(void) { \
    int team_flag, team_num; \
    struct TeamData dummy; \
    TeamDatas = &dummy; \
