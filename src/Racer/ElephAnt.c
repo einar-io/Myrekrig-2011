@@ -107,12 +107,15 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
 
 int goRandomDirection(u_long random, u_long count)
 {
-    u_long randomseed;
+    u_long randomseed = random;
   
-
-    randomseed = ((((random)^count))%5)+1;
+    for(count; count > 1; count--)
+    {
+        randomseed = randomseed*random;
+    }
     
-    return randomseed;
+    
+    return (randomseed%5)+1;
     
 }
 
