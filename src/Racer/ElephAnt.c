@@ -35,35 +35,32 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
         mem->currentx = 0;
         mem->currenty = 0;
         mem->gotobaseflag = 0;
-    }
-    //Hvis myren står alene på en base, uden mad, gå et random sted hen efter mad.
-    if((felter->Base == 1)&& (felter->NumFood == 0))
-    {
-        mem->bx = 0;
-        mem->by = 0;
-        mem->gotobaseflag = 0;
         selectedDirection = goRandomDirection(mem->random, mem->count);
         switch(selectedDirection)
         {
                 case(Right):
                 {
                     mem->currentx += 1;
+                    return selectedDirection;
                 }
                 case(Left):
                 {
                     mem->currentx -= 1;
+                    return selectedDirection;
                 }
                 case(Up):
                 {
                     mem->currenty += 1;
+                    return selectedDirection;
                 }
                 case(Down):
                 {
                     mem->currenty -= 1;
+                    return selectedDirection;
                 }
         }
     }
-        
+            
     //Hvis myren ikke står på en base, uden mad, gå et random sted hen efter mad.
     if((felter->NumFood == 0) && (felter->Base == 0))
     {
