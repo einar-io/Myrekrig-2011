@@ -5,102 +5,151 @@ enum {Right = 1, Left = 3, Up = 4, Down = 2, UpWithFood = 12, RightWithFood = 9,
 
 int goRandomDirection(u_long random, u_long count);
 
+
 struct AntBrain {
    u_long random;
-   short x,y;
-   short foodx[10],foody[10];
+   int bx, by;
    u_long count;
-   short currentx, currenty;
-};
+   long currentx, currenty;
+   short gotobaseflag;
+}mem;
 
-struct AntBrain memory;
 
 
 int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
 
     
     int selectedDirection = 0;
+   
     mem->count ++;
     
-    
-    //Hvis myren står alene på en base, gå et random sted hen efter mad.
-    if((felter->Base == 1))
+    if (mem->count > 99)
     {
-        (mem->x) = 0;
-        (mem->y) = 0;
-        selectedDirection = goRandomDirection(mem->random, mem->count);
+        mem->count = 1;
     }
-    
-    //Hvis myren ikke står på en base, gå et random sted hed efter mad.
-    if(felter->NumFood == 0)
+    //hvis myren står på en base, sæt base koordinater
+    if(felter->Base == 1)
     {
-        selectedDirection = goRandomDirection(mem->random, mem->count);
+        mem->bx = 0;
+        mem->by = 0;
+        mem->currentx = 0;
+        mem->currenty = 0;
+        mem->gotobaseflag = 0;
     }
-    
-    //Hvis der er mad på pågældende felt, tag det med til basen.
-    if(felter->NumFood != 0)
+    //Hvis myren står alene på en base, uden mad, gå et random sted hen efter mad.
+    if((felter->Base == 1)&& (felter->NumFood == 0))
     {
-        if(mem->x < mem->currentx)
+        mem->bx = 0;
+        mem->by = 0;
+        mem->gotobaseflag = 0;
+        selectedDirection = goRandomDirection(mem->random, mem->count);
+        switch(selectedDirection)
         {
-            selectedDirection = LeftWithFood;
+                case(Right):
+                {
+                    mem->currentx += 1;
+                }
+                case(Left):
+                {
+                    mem->currentx -= 1;
+                }
+                case(Up):
+                {
+                    mem->currenty += 1;
+                }
+                case(Down):
+                {
+                    mem->currenty -= 1;
+                }
+        }
+    }
+        
+    //Hvis myren ikke står på en base, uden mad, gå et random sted hen efter mad.
+    if((felter->NumFood == 0) && (felter->Base == 0))
+    {
+        selectedDirection = goRandomDirection(mem->random, mem->count);
+        switch(selectedDirection)
+        {
+                case(Right):
+                {
+                    mem->currentx += 1;
+                }
+                case(Left):
+                {
+                    mem->currentx -= 1;
+                }
+                case(Up):
+                {
+                    mem->currenty += 1;
+                }
+                case(Down):
+                {
+                    mem->currenty -= 1;
+                }
+        }
+    }
+    
+    if((felter->NumFood != 0) && (felter->NumAnts == 1) && (felter->Base == 0))
+    {
+        mem->gotobaseflag = 1;
+        
+        if(mem->currentx > mem->bx)
+        {
+            selectedDirection = Left +8;
+            mem->currentx -= 1;
+            
+        }
+        if(mem->currentx < mem->bx)
+        {
+            selectedDirection = Right +8;
+            mem->currentx += 1;
+            
+        }
+        if((mem->currentx == mem->bx)&& (mem->currenty < mem->by))
+        {
+            selectedDirection = Up + 8;
+            mem->currenty += 1;
+            
+        }
+        if((mem->currentx == mem->bx) && (mem->currenty > mem->by))
+        {
+            selectedDirection = Down + 8;
+            mem->currenty -= 1;
             
         }
         
-        if(mem->x > mem->currentx)
-        {
-            selectedDirection = RightWithFood;
-            
-        }
-        if(mem->y < mem->currenty)
-        {
-            selectedDirection = DownWithFood;
-            
-        }
-        if(mem->y > mem->currenty)
-        {
-            selectedDirection = UpWithFood;
-         
-        }
-        
     }
     
-    switch(selectedDirection)
+    if(mem->gotobaseflag == 1)
     {
-        case(Right):
+        if(mem->currentx > mem->bx)
         {
-           mem->currentx += 1;
+            selectedDirection = Left;
+            mem->currentx -= 1;
+            
         }
-        case(Down):
+        if(mem->currentx < mem->bx)
         {
-           mem->currenty -= 1;
+            selectedDirection = Right;
+            mem->currentx += 1;
+            
         }
-        case(Left):
+        if((mem->currentx == mem->bx)&& (mem->currenty < mem->by))
         {
-           mem->currentx -= 1;
+            selectedDirection = Up;
+            mem->currenty += 1;
+            
         }
-        case(Up):
+        if((mem->currentx == mem->bx) && (mem->currenty > mem->by))
         {
-           mem->currenty += 1;
+            selectedDirection = Down;
+            mem->currenty -= 1;
+            
         }
-        case(RightWithFood):
-        {
-           mem->currentx += 1;
-        }
-        case(DownWithFood):
-        {
-           mem->currenty -= 1;
-        }
-        case(LeftWithFood):
-        {
-           mem->currentx -= 1;
-        }
-        case(UpWithFood):
-        {
-           mem->currenty += 1;
-        }
-        default:
-            break;
     }
+    
+    
+   
     
     return selectedDirection;
 }
@@ -108,14 +157,15 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
 int goRandomDirection(u_long random, u_long count)
 {
     u_long randomseed = random;
+    u_long counter = count;
   
-    for(count; count > 1; count--)
+    for(counter = counter; counter > 1; counter--)
     {
         randomseed = randomseed*random;
     }
     
     
-    return (randomseed%5)+1;
+    return (randomseed % 5)+1;
     
 }
 
