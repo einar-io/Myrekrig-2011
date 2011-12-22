@@ -67,54 +67,63 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
     //Hvis myren ikke står på en base, uden mad, gå et random sted hen efter mad.
     if((felter->NumFood == 0) && (felter->Base == 0))
     {
+        mem->gotobaseflag = 0;
         selectedDirection = goRandomDirection(mem->random, mem->count);
         switch(selectedDirection)
         {
                 case(Right):
                 {
                     mem->currentx += 1;
+                    return selectedDirection;
                 }
                 case(Left):
                 {
                     mem->currentx -= 1;
+                    return selectedDirection;
                 }
                 case(Up):
                 {
                     mem->currenty += 1;
+                    return selectedDirection;
                 }
                 case(Down):
                 {
                     mem->currenty -= 1;
+                    return selectedDirection;
                 }
         }
     }
     
-    if((felter->NumFood != 0) && (felter->NumAnts == 1) && (felter->Base == 0))
+    if((felter->NumFood != 0) && (felter->NumAnts == 1) && (felter->Base == 0)  && (mem->gotobaseflag == 0))
     {
         mem->gotobaseflag = 1;
         
         if(mem->currentx > mem->bx)
         {
-            selectedDirection = Left +8;
+            selectedDirection = LeftWithFood;
             mem->currentx -= 1;
+            return selectedDirection;
             
         }
         if(mem->currentx < mem->bx)
         {
-            selectedDirection = Right +8;
+            selectedDirection = RightWithFood;
             mem->currentx += 1;
+            return selectedDirection;
             
         }
         if((mem->currentx == mem->bx)&& (mem->currenty < mem->by))
         {
-            selectedDirection = Up + 8;
+            selectedDirection = UpWithFood;
             mem->currenty += 1;
+            return selectedDirection;
             
         }
         if((mem->currentx == mem->bx) && (mem->currenty > mem->by))
         {
-            selectedDirection = Down + 8;
+            selectedDirection = DownWithFood;
             mem->currenty -= 1;
+            return selectedDirection;
             
         }
         
@@ -124,26 +133,29 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
     {
         if(mem->currentx > mem->bx)
         {
-            selectedDirection = Left;
+            selectedDirection = LeftWithFood;
             mem->currentx -= 1;
+            return selectedDirection;
             
         }
         if(mem->currentx < mem->bx)
         {
-            selectedDirection = Right;
+            selectedDirection = RightWithFood;
             mem->currentx += 1;
-            
+            return selectedDirection;
         }
         if((mem->currentx == mem->bx)&& (mem->currenty < mem->by))
         {
-            selectedDirection = Up;
+            selectedDirection = UpWithFood;
             mem->currenty += 1;
+            return selectedDirection;
             
         }
         if((mem->currentx == mem->bx) && (mem->currenty > mem->by))
         {
-            selectedDirection = Down;
+            selectedDirection = DownWithFood;
             mem->currenty -= 1;
+            return selectedDirection;
             
         }
     }
