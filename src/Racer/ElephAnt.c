@@ -22,11 +22,7 @@ int AntFunc(struct SquareData *felter, struct AntBrain *mem) {
     int selectedDirection = 0;
    
     mem->count ++;
-    
-    if (mem->count > 99)
-    {
-        mem->count = 1;
-    }
+
     //hvis myren står på en base, sæt base koordinater
     if(felter->Base == 1)
     {
