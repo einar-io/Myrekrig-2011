@@ -2,6 +2,10 @@
 #include "MyreKrig.h"
 
 UseAntBegin
+UseAnt(SunMyre)
+UseAnt(LightCore3)
+
+
 /* Standard *
 UseAnt(A5)
 UseAnt(AntAgonist)

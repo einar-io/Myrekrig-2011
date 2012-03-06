@@ -1,8 +1,10 @@
-# ANTFILES = $(wildcard Racer/*.c)
+#ANTFILES = $(wildcard Racer/*.c)
 ANTFILES = ${shell perl -ne 'if (/^UseAnt\(([^\)]*)\)/ && ! $$e{$$1}) { print "Racer/$$1.c "; $$e{$$1} = 1; }' MyreHold.c}
+#ANTFILES = Racer/Blitz.c Racer/Caesar.c
 
 CC = gcc
-CFLAGS = -fsigned-char -Wall -O3 -I. $(DEBUG)
+CFLAGS =  -fsigned-char -Wall -O3 -I. $(DEBUG) -m32
+LDFLAGS = -m32
 DEBUG = $(if $(findstring debug, $(MAKECMDGOALS)),-ggdb,-DNDEBUG)
 
 MAIN = MyreKrig.o MyreHold.o
@@ -18,16 +20,16 @@ OBJS = $(MAIN) $(SYS) $(ANTS)
 all:		mk mk_a mk_c mk_x
 
 mk:		$(MAIN) $(ANTS) MK_Quiet.o
-		$(CC) $+ -o $@
+		$(CC) $(LDFLAGS) $+ -o $@
 
 mk_a:		$(MAIN) $(ANTS) MK_Ascii.o
-		$(CC) $+ -o $@
+		$(CC) $(LDFLAGS) $+ -o $@
 
 mk_c:		$(MAIN) $(ANTS) MK_Count.o
-		$(CC) $+ -o $@
+		$(CC) $(LDFLAGS) $+ -o $@
 
 mk_x:		$(MAIN) $(ANTS) MK_XWin.o
-		$(CC) $+ -L/usr/X11R6/lib -lX11 -o $@
+		$(CC) $(LDFLAGS) $+ -L/usr/X11R6/lib -lX11 -o $@
 
 $(MAIN):	$(MAINDEP)
 $(SYS):		$(SYSDEP)
