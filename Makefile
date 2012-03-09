@@ -2,7 +2,7 @@
 ANTFILES = ${shell perl -ne 'if (/^UseAnt\(([^\)]*)\)/ && ! $$e{$$1}) { print "src/Racer/$$1.c "; $$e{$$1} = 1; }' src/MyreHold.c}
 
 CC = gcc
-CFLAGS =  -fsigned-char -Wall -O3 -I. $(DEBUG)
+CFLAGS =  -fsigned-char -Wall -O3 -I. -Isrc $(DEBUG)
 LDFLAGS = 
 DEBUG = $(if $(findstring debug, $(MAKECMDGOALS)),-ggdb,-DNDEBUG)
 
@@ -18,16 +18,16 @@ OBJS = $(MAIN) $(SYS) $(ANTS)
 
 all:		mk mk_a mk_c mk_x
 
-mk:		$(MAIN) $(ANTS) MK_Quiet.o
+mk:		$(MAIN) $(ANTS) src/MK_Quiet.o
 		$(CC) $(LDFLAGS) $+ -o $@
 
-mk_a:		$(MAIN) $(ANTS) MK_Ascii.o
+mk_a:		$(MAIN) $(ANTS) src/MK_Ascii.o
 		$(CC) $(LDFLAGS) $+ -o $@
 
-mk_c:		$(MAIN) $(ANTS) MK_Count.o
+mk_c:		$(MAIN) $(ANTS) src/MK_Count.o
 		$(CC) $(LDFLAGS) $+ -o $@
 
-mk_x:		$(MAIN) $(ANTS) MK_XWin.o
+mk_x:		$(MAIN) $(ANTS) src/MK_XWin.o
 		$(CC) $(LDFLAGS) $+ -L/usr/X11R6/lib -lX11 -o $@
 
 $(MAIN):	$(MAINDEP)
